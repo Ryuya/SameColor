@@ -17,6 +17,9 @@ public enum GameState
 
 public class GameManager : SingletonMonoBehaviour<GameManager>
 {
+    public int money = 0;
+    public int trueBallNum = 0;
+    private float retio = 1f;
     public Color currentColor;
     public GameObject ballPrefab;
     public GameObject result;
@@ -28,11 +31,14 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public Player player;
     public Text timeText;
     public Text homeLevelText;
+    public Text moneyText;
     public bool isShowResultCanvas = false;
     //ゲームの状態
     public GameState _gameState;
     public GameObject resultCanvas;
     public GameObject shopPanel;
+
+    public Text damageText;
     // Start is called before the first frame update
     void Start()
     {
@@ -73,7 +79,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public void Setting1stGame()
     {
         CurrentColorSet();
-        InstantiateTrueBall();
+        InstantiateTrueBall(trueBallNum);
     }
 
     public void SettingStageStart(int Level)
@@ -84,17 +90,23 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public void NextStage()
     {
         level++;
-        
+        var reward = 0.0f;
         var balls = GameObject.FindGameObjectsWithTag("Ball");
         foreach (var ball in balls)
         {
+            reward += ball.GetComponent<Ball>().damage* retio;
             Destroy(ball);
         }
-        time += (level + 5);
-        InstantiateTakeTimeText((level + 5));
+        reward = reward/ 3f + (10);
+        money += (int)Mathf.Floor(reward);
+        time += (int) Mathf.Floor(reward);
+        //InstantiateTakeTimeText(reward);
+        InstantiateTakeMoneyText((int)Mathf.Floor(reward));
         timeText.text = time.ToString("F2");
+        moneyText.text = money.ToString("F2");
         CurrentColorSet();
-        InstantiateTrueBall();
+        InstantiateTrueBall(trueBallNum);
+
         InstantiateFalseBall(level);
         _gameState = GameState.Wait;
     }
@@ -111,56 +123,54 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     }
     public void CurrentColorSet()
     {
-        int rand = Random.Range(1,9);
+        int rand = Random.Range(1,7);
         Debug.Log(rand);
         switch (rand)
         {
             case 1:
-                currentColor = Color.gray;
-                break;
-            case 2:
                 currentColor = Color.blue;
                 break;
-            case 3:
-                
+            case 2:
                 currentColor = Color.yellow;
                 break;
-            case 4:
+            case 3:
                 currentColor = Color.red;
                 break;
-            case 5:
-                currentColor = Color.black;
                 break;
-            case 6:
+            case 4:
                 currentColor = Color.green;
                 break;
-            case 7:
+            case 5:
                 currentColor = Color.magenta;
                 break;
-            
-            case 8:
+            case 6:
                 currentColor = Color.cyan;
                 break;
         }
     }
     
     //正解のぼーるをだす
-    public void InstantiateTrueBall()
+    public void InstantiateTrueBall(int trueBallNum)
     {
-        var x = Random.Range(-8f,9.43f);
-        var y = Random.Range(4.96f,5.9f);
-        var z = 0f;
-        var obj = GameObject.Instantiate( this.ballPrefab,new Vector3(x,y,z),Quaternion.identity);
+        for (int i = 0; i < trueBallNum; i++)
+        {
+            var x = Random.Range(-8f,9.43f);
+            var y = Random.Range(4.96f,5.9f);
+            var z = 0f;
+            var obj = GameObject.Instantiate( this.ballPrefab,new Vector3(x,y,z),Quaternion.identity);
+            obj.GetComponent<Ball>().isTrueBall = true;
+            obj.GetComponent<SpriteRenderer>().color = currentColor;
+            obj.GetComponent<Ball>()._color = currentColor;
+            obj.AddComponent<TrueBall>();
+            //プレイヤーの色を変える
+            playerObj.GetComponent<SpriteRenderer>().color = currentColor;
+        }
         
-        obj.GetComponent<SpriteRenderer>().color = currentColor;
-        obj.GetComponent<Ball>()._color = currentColor;
-        obj.GetComponent<Ball>().isTrueBall = true;
-        //プレイヤーの色を変える
-        playerObj.GetComponent<SpriteRenderer>().color = currentColor;
     }
     
     public void InstantiateFalseBall(int Level)
     {
+        if (Level > 20) Level = 20;  
         for (int i = 0; i < Level * 3; i++)
         {
             var x = Random.Range(-8f,9.43f);
@@ -175,16 +185,21 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     {
         var obj = (GameObject)GameObject.Instantiate(Resources.Load("DamegeText"));
         obj.transform.SetParent(GameObject.Find("Canvas").transform,false);
-        //obj.transform.position = GameObject.Find("Canvas").transform.position;
-        obj.GetComponent<Text>().text = "-" + damageSec.ToString() + "sec";
+        obj.GetComponent<Text>().text = "-" + damageSec.ToString("F1") + "sec";
+    }
+    
+    public void InstantiateTakeMoneyText(float money)
+    {
+        var obj = (GameObject)GameObject.Instantiate(Resources.Load("TakeMoneyText"));
+        obj.transform.SetParent(GameObject.Find("Canvas").transform,false);
+        obj.GetComponent<Text>().text = "$" + money.ToString("F0");
     }
     
     public void InstantiateTakeTimeText(float takeTimeSec)
     {
         var obj = (GameObject)GameObject.Instantiate(Resources.Load("TakeTimeText"));
         obj.transform.SetParent(GameObject.Find("Canvas").transform,false);
-        //obj.transform.position = GameObject.Find("Canvas").transform.position;
-        obj.GetComponent<Text>().text = "+" + takeTimeSec.ToString() + "sec";
+        obj.GetComponent<Text>().text = "+" + takeTimeSec.ToString("F2") + "sec";
     }
 
     public void Retry()

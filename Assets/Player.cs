@@ -49,6 +49,8 @@ public class Player : MonoBehaviour
     {
         if (isAttack && other.collider.CompareTag("Ball"))
         {
+            //GameManager.Instance.time += other.collider.GetComponent<Ball>().damage;
+            //GameManager.Instance.InstantiateTakeTimeText(other.collider.GetComponent<Ball>().damage);
             Destroy(other.gameObject);
         }
     }

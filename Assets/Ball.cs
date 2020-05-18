@@ -13,7 +13,7 @@ public enum ColorState{
 }
 public class Ball : MonoBehaviour
 {
-    private float damage = 0.8f;
+    public float damage = 0.8f;
     private ColorState _colorState;
 
     public Color _color;
@@ -29,42 +29,33 @@ public class Ball : MonoBehaviour
     }
     public void RandomColorSet()
     {
-        int rand = Random.Range(1,8);
+        int rand = Random.Range(1,7);
         switch (rand)
         {
             case 1:
-                _colorState = ColorState.white;
-                GetComponent<SpriteRenderer>().color = Color.black;
-                _color = Color.black;
-                break;
-            case 2:
                 _colorState = ColorState.blue;
                 GetComponent<SpriteRenderer>().color = Color.blue;
                 _color = Color.blue;
                 break;
-            case 3:
+            case 2:
                 _colorState = ColorState.yellow;
                 GetComponent<SpriteRenderer>().color = Color.yellow;
                 _color = Color.yellow;
                 break;
-            case 4:
+            case 3:
                 _colorState = ColorState.red;
                 GetComponent<SpriteRenderer>().color = Color.red;
                 _color = Color.red;
                 break;
-            case 5:
-                GetComponent<SpriteRenderer>().color = Color.gray;
-                _color = Color.gray;
-                break;
-            case 6:
+            case 4:
                 GetComponent<SpriteRenderer>().color = Color.green;
                 _color = Color.green;
                 break;
-            case 7:
+            case 5:
                 GetComponent<SpriteRenderer>().color = Color.magenta;
                 _color = Color.magenta;
                 break;
-            case 8:
+            case 6:
                 GetComponent<SpriteRenderer>().color = Color.cyan;
                 _color = Color.cyan;
                 break;
