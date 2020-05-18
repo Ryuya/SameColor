@@ -13,6 +13,7 @@ public enum ColorState{
 }
 public class Ball : MonoBehaviour
 {
+    private float damage = 0.8f;
     private ColorState _colorState;
 
     public Color _color;
@@ -22,16 +23,19 @@ public class Ball : MonoBehaviour
     void Start()
     {
         if(isTrueBall == false) this.RandomColorSet();
+        var retio = (GameManager.Instance.level / 10);
+        damage += retio;
+        
     }
     public void RandomColorSet()
     {
-        int rand = Random.Range(1,5);
+        int rand = Random.Range(1,8);
         switch (rand)
         {
             case 1:
                 _colorState = ColorState.white;
-                GetComponent<SpriteRenderer>().color = Color.white;
-                _color = Color.white;
+                GetComponent<SpriteRenderer>().color = Color.black;
+                _color = Color.black;
                 break;
             case 2:
                 _colorState = ColorState.blue;
@@ -48,6 +52,22 @@ public class Ball : MonoBehaviour
                 GetComponent<SpriteRenderer>().color = Color.red;
                 _color = Color.red;
                 break;
+            case 5:
+                GetComponent<SpriteRenderer>().color = Color.gray;
+                _color = Color.gray;
+                break;
+            case 6:
+                GetComponent<SpriteRenderer>().color = Color.green;
+                _color = Color.green;
+                break;
+            case 7:
+                GetComponent<SpriteRenderer>().color = Color.magenta;
+                _color = Color.magenta;
+                break;
+            case 8:
+                GetComponent<SpriteRenderer>().color = Color.cyan;
+                _color = Color.cyan;
+                break;
         }
 
         if (_color == GameManager.Instance.currentColor)
@@ -62,12 +82,14 @@ public class Ball : MonoBehaviour
         {
             if (other.collider.gameObject.GetComponent<SpriteRenderer>().color == _color)
             {
+                if(GameManager.Instance._gameState == GameState.Play)
                 GameManager.Instance.NextStage();
                 Destroy(gameObject);
             }
             else
             {
-                GameManager.Instance.GameOver();
+                GameManager.Instance.time -= damage;
+                GameManager.Instance.InstantiateDamageText(damage);
             }
         }
     }
