@@ -19,6 +19,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 {
     public int money = 0;
     public int trueBallNum = 0;
+    public bool isAttack = false;
     private float retio = 1f;
     public Color currentColor;
     public GameObject ballPrefab;
@@ -100,7 +101,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
         reward = reward/ 3f + (10);
         money += (int)Mathf.Floor(reward);
         time += (int) Mathf.Floor(reward);
-        //InstantiateTakeTimeText(reward);
+        InstantiateTakeTimeText(reward);
         InstantiateTakeMoneyText((int)Mathf.Floor(reward));
         timeText.text = time.ToString("F2");
         moneyText.text = money.ToString("F2");

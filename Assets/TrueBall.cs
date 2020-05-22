@@ -9,7 +9,7 @@ public class TrueBall : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Ball"))
         {
-            if (other.gameObject.GetComponent<Ball>().isTrueBall == false)
+            if (other.gameObject.GetComponent<Ball>().isTrueBall == false && GameManager.Instance.isAttack == true)
             {
                 Destroy(other.gameObject);
             }

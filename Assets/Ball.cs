@@ -23,7 +23,7 @@ public class Ball : MonoBehaviour
     void Start()
     {
         if(isTrueBall == false) this.RandomColorSet();
-        var retio = (GameManager.Instance.level / 10);
+        var retio = (5 + GameManager.Instance.level / 4);
         damage += retio;
         
     }
