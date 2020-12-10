@@ -23,7 +23,7 @@ public class Ball : MonoBehaviour
     void Start()
     {
         if(isTrueBall == false) this.RandomColorSet();
-        var retio = (5 + GameManager.Instance.level / 4);
+        var retio = (2 + GameManager.Instance.level / 4);
         damage += retio;
         
     }
@@ -73,9 +73,11 @@ public class Ball : MonoBehaviour
         {
             if (other.collider.gameObject.GetComponent<SpriteRenderer>().color == _color)
             {
-                if(GameManager.Instance._gameState == GameState.Play)
-                GameManager.Instance.NextStage();
-                Destroy(gameObject);
+                if (GameManager.Instance._gameState == GameState.Play)
+                {
+                   
+                    Destroy(gameObject);
+                }
             }
             else
             {

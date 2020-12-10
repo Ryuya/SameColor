@@ -27,11 +27,11 @@ public class Player : MonoBehaviour
         {
             if (Input.GetKey(KeyCode.LeftArrow))
             {
-                Debug.Log("left");
+
                 rb.AddForce(new Vector2(-1 * speed,0));
             } else if (Input.GetKey(KeyCode.RightArrow))
             {
-                Debug.Log("right");
+
                 rb.AddForce(new Vector2(1 * speed, 0));
             }
 
@@ -52,6 +52,24 @@ public class Player : MonoBehaviour
             //GameManager.Instance.time += other.collider.GetComponent<Ball>().damage;
             //GameManager.Instance.InstantiateTakeTimeText(other.collider.GetComponent<Ball>().damage);
             Destroy(other.gameObject);
+        } else
+        {
+            if (other.collider.CompareTag("TrueBall"))
+            {
+                Time.timeScale = 0.0f;
+                var balls = GameObject.FindGameObjectsWithTag("Ball");
+                foreach (var ball in balls)
+                {
+                    Destroy(ball);
+                }
+                var balls2 = GameObject.FindGameObjectsWithTag("TrueBall");
+                foreach (var ball in balls2)
+                {
+                    Destroy(ball);
+                }
+                GameManager.Instance.NextStage();
+            }
+            
         }
     }
 }

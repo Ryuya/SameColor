@@ -11,18 +11,20 @@ using Random = UnityEngine.Random;
 public enum GameState
 {
     Wait,
+    Start,
     Play,
     Result,
 }
 
 public class GameManager : SingletonMonoBehaviour<GameManager>
 {
+    [System.NonSerialized]
     public int money = 0;
     public int trueBallNum = 0;
     public bool isAttack = false;
     private float retio = 1f;
     public Color currentColor;
-    public GameObject ballPrefab;
+    public GameObject ballPrefab,hissatsuBallPdefab;
     public GameObject result;
     //現在のゲームの難易度
     public int level;
@@ -40,10 +42,23 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public GameObject shopPanel;
 
     public Text damageText;
+
+    public GameObject StartUI, PlayUI;
+
+    //購入回数
+    [System.NonSerialized]
+    public int buyCount = 1;
+    public int place = 0;
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log(moneyText.text);
+        moneyText.text = money.ToString("F2");
         player = GameObject.Find("Player").GetComponent<Player>();
+        if(_gameState == GameState.Start)
+        {
+            PlayUI.SetActive(false);
+        }
         Setting1stGame();
     }
 
@@ -56,6 +71,9 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             case GameState.Wait:
                 Time.timeScale = 0;
                 shopPanel.SetActive(true);
+                break;
+            case GameState.Start:
+                time -= Time.deltaTime;
                 break;
             case GameState.Play:
                 time -= Time.deltaTime;
@@ -91,14 +109,12 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public void NextStage()
     {
         level++;
+        //プレイヤーを初期位置へ
+        player.transform.position = new Vector3(0,-4,0);
+        player.tag = "Player";
         var reward = 0.0f;
-        var balls = GameObject.FindGameObjectsWithTag("Ball");
-        foreach (var ball in balls)
-        {
-            reward += ball.GetComponent<Ball>().damage* retio;
-            Destroy(ball);
-        }
-        reward = reward/ 3f + (10);
+        reward += level * retio;
+        reward = reward + (10);
         money += (int)Mathf.Floor(reward);
         time += (int) Mathf.Floor(reward);
         InstantiateTakeTimeText(reward);
@@ -114,6 +130,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
 
     public void GameOver()
     {
+        player.tag = "Muteki";
         ShowResult();
         Debug.Log("GameOver");
     }
@@ -125,7 +142,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public void CurrentColorSet()
     {
         int rand = Random.Range(1,7);
-        Debug.Log(rand);
         switch (rand)
         {
             case 1:
@@ -160,6 +176,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             var z = 0f;
             var obj = GameObject.Instantiate( this.ballPrefab,new Vector3(x,y,z),Quaternion.identity);
             obj.GetComponent<Ball>().isTrueBall = true;
+            obj.tag = "TrueBall";
             obj.GetComponent<SpriteRenderer>().color = currentColor;
             obj.GetComponent<Ball>()._color = currentColor;
             obj.AddComponent<TrueBall>();
@@ -177,34 +194,57 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
             var x = Random.Range(-8f,9.43f);
             var y = Random.Range(4.96f,5.9f);
             var z = 0f;
-            var obj = GameObject.Instantiate( this.ballPrefab,new Vector3(x,y,z),Quaternion.identity);
-            obj.GetComponent<Ball>().isTrueBall = false;
+            if (1 == Random.Range(1,15))
+            {
+                var obj = GameObject.Instantiate(this.hissatsuBallPdefab, new Vector3(x, y, z), Quaternion.identity);
+                obj.GetComponent<Ball>().isTrueBall = false;
+            } else
+            {
+                var obj = GameObject.Instantiate(this.ballPrefab, new Vector3(x, y, z), Quaternion.identity);
+                obj.GetComponent<Ball>().isTrueBall = false;
+            }
+            
         }
     }
 
     public void InstantiateDamageText(float damageSec)
     {
         var obj = (GameObject)GameObject.Instantiate(Resources.Load("DamegeText"));
-        obj.transform.SetParent(GameObject.Find("Canvas").transform,false);
+        obj.transform.SetParent(GameObject.Find("GameCanvas").transform,false);
         obj.GetComponent<Text>().text = "-" + damageSec.ToString("F1") + "sec";
     }
     
     public void InstantiateTakeMoneyText(float money)
     {
         var obj = (GameObject)GameObject.Instantiate(Resources.Load("TakeMoneyText"));
-        obj.transform.SetParent(GameObject.Find("Canvas").transform,false);
+        obj.transform.SetParent(GameObject.Find("GameCanvas").transform,false);
         obj.GetComponent<Text>().text = "$" + money.ToString("F0");
     }
     
     public void InstantiateTakeTimeText(float takeTimeSec)
     {
         var obj = (GameObject)GameObject.Instantiate(Resources.Load("TakeTimeText"));
-        obj.transform.SetParent(GameObject.Find("Canvas").transform,false);
+        obj.transform.SetParent(GameObject.Find("GameCanvas").transform,false);
         obj.GetComponent<Text>().text = "+" + takeTimeSec.ToString("F2") + "sec";
+    }
+
+    public void StartButton()
+    {
+        SceneManager.LoadScene("GAME");
+        player = GameObject.Find("Player").GetComponent<Player>();
+        PlayUI.SetActive(false);
+    }
+
+    public void GoStartScreen()
+    {
+        SceneManager.LoadScene("START");
+
     }
 
     public void Retry()
     {
         SceneManager.LoadScene("GAME");
+        player = GameObject.Find("Player").GetComponent<Player>();
+        PlayUI.SetActive(false);
     }
 }

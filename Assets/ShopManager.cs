@@ -10,11 +10,12 @@ public class ShopManager : MonoBehaviour
 {
     public bool isBaughtAddToge = false;
     public Button attackBuyButton,TrueBallButton,TogeButton;
+    GameManager gameManager;
+
     public void OnEnable()
     {
         CheckButton();
-
-
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     // Start is called before the first frame update
@@ -26,6 +27,7 @@ public class ShopManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        
         if (Input.GetKey(KeyCode.Return))
         {
             this.Go();
@@ -35,7 +37,9 @@ public class ShopManager : MonoBehaviour
     //一個目のアイテム　プレイヤーがTrueボール以外のボールにあたるとボールを消す
     public void BuyAttack(Button button)
     {
+        gameManager.buyCount++;
         var place = button.GetComponent<Place>().place;
+        Debug.Log(button.GetComponent<Place>().place);
         if (GameManager.Instance.money >= place)
         {
             GameManager.Instance.player.isAttack = true;
@@ -45,13 +49,14 @@ public class ShopManager : MonoBehaviour
             button.interactable = false;
         }
         CheckButton();
+        Go();
     }
 
     public void BuyTrueBall(Button button)
     {
-        
+        gameManager.buyCount++;
         int[] placeAry = {10, 50, 200};
-        var place = placeAry[GameManager.Instance.trueBallNum - 1];
+        var place = button.GetComponent<Place>().place;
         if (GameManager.Instance.money < place) return;
         GameManager.Instance.money -= place;
         GameManager.Instance.trueBallNum += 1;
@@ -66,11 +71,12 @@ public class ShopManager : MonoBehaviour
             button.interactable = false;
         }
         CheckButton();
+        Go();
     }
 
     public void BuyTrueBallAddToge(Button button)
     {
-        
+        gameManager.buyCount++;
         var place = button.GetComponent<Place>().place;
         if (GameManager.Instance.money >= place)
         {
@@ -86,6 +92,7 @@ public class ShopManager : MonoBehaviour
             
         }
         CheckButton();
+        Go();
     }
 
     public void CheckButton()
@@ -105,11 +112,14 @@ public class ShopManager : MonoBehaviour
         {
             TogeButton.interactable = false;
         }
+        
     }
     
     public void Go()
     {
+        Debug.Log(gameManager.buyCount);
         gameObject.SetActive(false);
+        GameManager.Instance.player.tag = "Player";
         GameManager.Instance.homeLevelText.text = GameManager.Instance.level.ToString();
         Time.timeScale = 1.0f;
         GameManager.Instance.damageText.text = GameObject.Find("ball(Clone)").GetComponent<Ball>().damage.ToString();
