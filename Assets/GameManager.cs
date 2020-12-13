@@ -73,6 +73,7 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
                 shopPanel.SetActive(true);
                 break;
             case GameState.Start:
+                Time.timeScale = 1.0f;
                 time -= Time.deltaTime;
                 break;
             case GameState.Play:
@@ -231,8 +232,6 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public void StartButton()
     {
         SceneManager.LoadScene("GAME");
-        player = GameObject.Find("Player").GetComponent<Player>();
-        PlayUI.SetActive(false);
     }
 
     public void GoStartScreen()
@@ -244,7 +243,5 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public void Retry()
     {
         SceneManager.LoadScene("GAME");
-        player = GameObject.Find("Player").GetComponent<Player>();
-        PlayUI.SetActive(false);
     }
 }

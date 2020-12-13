@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.UI;
 public class Player : MonoBehaviour
 {
     Rigidbody2D rb;
@@ -14,7 +14,9 @@ public class Player : MonoBehaviour
     //    get { return this.velocity; }
     //}
     public bool isAttack = false;
+    public bool isLeft=false, isRight=false;
     // Start is called before the first frame update
+    public Text isRightVal, isLeftVal;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -23,26 +25,72 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (GameManager.Instance._gameState == GameState.Play)
+        //isRightVal.text = isRight.ToString();
+        //isLeftVal.text = isLeft.ToString();
+        if (GameManager.Instance._gameState == GameState.Play || GameManager.Instance._gameState == GameState.Start)
         {
             if (Input.GetKey(KeyCode.LeftArrow))
             {
 
-                rb.AddForce(new Vector2(-1 * speed,0));
+                rb.AddForce(new Vector2(-1 * speed * 100 * Time.deltaTime, 0));
             } else if (Input.GetKey(KeyCode.RightArrow))
             {
 
-                rb.AddForce(new Vector2(1 * speed, 0));
+                rb.AddForce(new Vector2(1 * speed * 100 * Time.deltaTime, 0));
             }
 
             if (Input.GetKey(KeyCode.Space))
             {
-                rb.AddForce(new Vector2(0f,5 * speed),ForceMode2D.Impulse);
+                rb.AddForce(new Vector2(0f, 5 * speed * Time.deltaTime), ForceMode2D.Impulse);
             }
-            rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x, -3.5f, 3.5f), Mathf.Clamp(rb.velocity.y, -3.5f, 3.5f));
 
+            if (Input.touchCount > 0)
+            {
+                foreach (Touch touch in Input.touches)
+                {
+                    // 座標xがスクリーンの2分の1以上の場合
+                    if (touch.position.x >= Screen.width / 2)
+                    {
+                        // 右側をタップしたら左のフリッパーが動く
+                        if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
+                        {
+                            isRight = true;
+
+                        }
+                        if (touch.phase == TouchPhase.Canceled || touch.phase == TouchPhase.Ended )
+                        {
+                            isRight = false;
+                        }
+                    }
+                    if (touch.position.x <= Screen.width / 2)
+                    {
+
+                        // 左側をタップしたら左のフリッパーが動く
+                        if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Moved || touch.phase == TouchPhase.Stationary)
+                        {
+                            isLeft = true;
+
+                        }
+                        if (touch.phase == TouchPhase.Canceled || touch.phase == TouchPhase.Ended)
+                        {
+                            isLeft = false;
+                        }
+                    }
+                }
+            } else
+            {
+                isRight = false;
+                isLeft = false;
+            }
+
+            if (isRight)rb.AddForce(new Vector2(3.5f * speed * 1330 * Time.deltaTime, 0),ForceMode2D.Impulse);
+            if(isLeft)rb.AddForce(new Vector2(-3.5f * speed * 1330 * Time.deltaTime, 0), ForceMode2D.Impulse);
+            if (isLeft && isRight)
+            {
+                rb.AddForce(new Vector2(0f, 5 * speed), ForceMode2D.Impulse);
+            }
+            rb.velocity = new Vector2(Mathf.Clamp(rb.velocity.x, -5.5f, 5.5f), Mathf.Clamp(rb.velocity.y, -3.5f, 3.5f));
         }
-        
     }
 
     public void OnCollisionEnter2D(Collision2D other)
