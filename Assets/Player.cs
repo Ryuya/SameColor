@@ -17,6 +17,9 @@ public class Player : MonoBehaviour
     public bool isLeft=false, isRight=false;
     // Start is called before the first frame update
     public Text isRightVal, isLeftVal;
+    public CameraShake shake;
+    public GameObject colEffectPrefab;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -117,7 +120,12 @@ public class Player : MonoBehaviour
                 }
                 GameManager.Instance.NextStage();
             }
-            
+            if (other.gameObject.CompareTag("Ball"))
+            {
+                Instantiate(colEffectPrefab, other.contacts[0].point, Quaternion.FromToRotation(Vector3.down, other.contacts[0].normal));
+
+                shake.Shake(0.2f, 0.1f);
+            }
         }
     }
 }
