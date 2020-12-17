@@ -50,6 +50,15 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public int buyCount = 1;
     public int place = 0;
     // Start is called before the first frame update
+    [SerializeField]
+    private float timeScale = 0.1f;
+    //　時間を遅くしている時間
+    [SerializeField]
+    private float slowTime = 1f;
+    //　経過時間
+    private float elapsedTime = 0f;
+    //　時間を遅くしているかどうか
+    private bool isSlowDown = false;
     void Start()
     {
         Debug.Log(moneyText.text);
@@ -78,6 +87,14 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
                 break;
             case GameState.Play:
                 time -= Time.deltaTime;
+                if (isSlowDown)
+                {
+                    elapsedTime += Time.unscaledDeltaTime;
+                    if (elapsedTime >= slowTime)
+                    {
+                        SetNormalTime();
+                    }
+                }
                 timeText.text = time.ToString("F2");
                 if (time < 0)
                 {
@@ -243,5 +260,18 @@ public class GameManager : SingletonMonoBehaviour<GameManager>
     public void Retry()
     {
         SceneManager.LoadScene("GAME");
+    }
+    //　時間を遅らせる処理
+    public void SlowDown()
+    {
+        elapsedTime = 0f;
+        Time.timeScale = timeScale;
+        isSlowDown = true;
+    }
+    //　時間を元に戻す処理
+    public void SetNormalTime()
+    {
+        Time.timeScale = 1f;
+        isSlowDown = false;
     }
 }

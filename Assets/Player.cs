@@ -123,7 +123,7 @@ public class Player : MonoBehaviour
             if (other.gameObject.CompareTag("Ball"))
             {
                 Instantiate(colEffectPrefab, other.contacts[0].point, Quaternion.FromToRotation(Vector3.down, other.contacts[0].normal));
-
+                GameManager.Instance.SlowDown();
                 shake.Shake(0.2f, 0.1f);
             }
         }
